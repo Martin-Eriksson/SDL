@@ -356,10 +356,10 @@ QueueCmdSetViewport(SDL_Renderer *renderer)
         if (cmd != NULL) {
             cmd->command = SDL_RENDERCMD_SETVIEWPORT;
             cmd->data.viewport.first = 0;  /* render backend will fill this in. */
-            cmd->data.viewport.rect.x = renderer->viewport.x;
-            cmd->data.viewport.rect.y = renderer->viewport.y;
-            cmd->data.viewport.rect.w = renderer->viewport.w;
-            cmd->data.viewport.rect.h = renderer->viewport.h;
+            cmd->data.viewport.rect.x = (int)renderer->viewport.x;
+            cmd->data.viewport.rect.y = (int)renderer->viewport.y;
+            cmd->data.viewport.rect.w = (int)renderer->viewport.w;
+            cmd->data.viewport.rect.h = (int)renderer->viewport.h;
             retval = renderer->QueueSetViewport(renderer, cmd);
             if (retval < 0) {
                 cmd->command = SDL_RENDERCMD_NO_OP;
@@ -385,10 +385,10 @@ QueueCmdSetClipRect(SDL_Renderer *renderer)
         } else {
             cmd->command = SDL_RENDERCMD_SETCLIPRECT;
             cmd->data.cliprect.enabled = renderer->clipping_enabled;
-            cmd->data.cliprect.rect.x = renderer->clip_rect.x;
-            cmd->data.cliprect.rect.y = renderer->clip_rect.y;
-            cmd->data.cliprect.rect.w = renderer->clip_rect.w;
-            cmd->data.cliprect.rect.h = renderer->clip_rect.h;
+            cmd->data.cliprect.rect.x = (int)renderer->clip_rect.x;
+            cmd->data.cliprect.rect.y = (int)renderer->clip_rect.y;
+            cmd->data.cliprect.rect.w = (int)renderer->clip_rect.w;
+            cmd->data.cliprect.rect.h = (int)renderer->clip_rect.h;
             SDL_memcpy(&renderer->last_queued_cliprect, &renderer->clip_rect, sizeof (SDL_Rect));
             renderer->last_queued_cliprect_enabled = renderer->clipping_enabled;
             renderer->cliprect_queued = SDL_TRUE;
@@ -728,13 +728,13 @@ SDL_RendererEventWatch(void *userdata, SDL_Event *event)
                     if (renderer->target) {
                         renderer->viewport_backup.x = 0;
                         renderer->viewport_backup.y = 0;
-                        renderer->viewport_backup.w = w;
-                        renderer->viewport_backup.h = h;
+                        renderer->viewport_backup.w = (float)w;
+                        renderer->viewport_backup.h = (float)h;
                     } else {
                         renderer->viewport.x = 0;
                         renderer->viewport.y = 0;
-                        renderer->viewport.w = w;
-                        renderer->viewport.h = h;
+                        renderer->viewport.w = (float)w;
+                        renderer->viewport.h = (float)h;
                         QueueCmdSetViewport(renderer);
                         FlushRenderCommandsIfNotBatching(renderer);
                     }
@@ -2191,8 +2191,8 @@ SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)
     if (texture) {
         renderer->viewport.x = 0.0f;
         renderer->viewport.y = 0.0f;
-        renderer->viewport.w = texture->w;
-        renderer->viewport.h = texture->h;
+        renderer->viewport.w = (float)texture->w;
+        renderer->viewport.h = (float)texture->h;
         SDL_zero(renderer->clip_rect);
         renderer->clipping_enabled = SDL_FALSE;
         renderer->scale.x = 1.0f;
@@ -2410,8 +2410,8 @@ SDL_RenderSetViewport(SDL_Renderer * renderer, const SDL_Rect * rect)
         if (SDL_GetRendererOutputSize(renderer, &w, &h) < 0) {
             return -1;
         }
-        renderer->viewport.w = w;
-        renderer->viewport.h = h;
+        renderer->viewport.w = (float)w;
+        renderer->viewport.h = (float)h;
     }
     retval = QueueCmdSetViewport(renderer);
     return retval < 0 ? retval : FlushRenderCommandsIfNotBatching(renderer);
@@ -2423,10 +2423,10 @@ SDL_RenderGetViewport(SDL_Renderer * renderer, SDL_Rect * rect)
     CHECK_RENDERER_MAGIC(renderer, );
 
     if (rect) {
-        rect->x = renderer->viewport.x / renderer->scale.x;
-        rect->y = renderer->viewport.y / renderer->scale.y;
-        rect->w = renderer->viewport.w / renderer->scale.x;
-        rect->h = renderer->viewport.h / renderer->scale.y;
+        rect->x = (int)(renderer->viewport.x / renderer->scale.x);
+        rect->y = (int)(renderer->viewport.y / renderer->scale.y);
+        rect->w = (int)(renderer->viewport.w / renderer->scale.x);
+        rect->h = (int)(renderer->viewport.h / renderer->scale.y);
     }
 }
 
@@ -2466,10 +2466,10 @@ SDL_RenderGetClipRect(SDL_Renderer * renderer, SDL_Rect * rect)
     CHECK_RENDERER_MAGIC(renderer, )
 
     if (rect) {
-        rect->x = renderer->clip_rect.x / renderer->scale.x;
-        rect->y = renderer->clip_rect.y / renderer->scale.y;
-        rect->w = renderer->clip_rect.w / renderer->scale.x;
-        rect->h = renderer->clip_rect.h / renderer->scale.y;
+        rect->x = (int)(renderer->clip_rect.x / renderer->scale.x);
+        rect->y = (int)(renderer->clip_rect.y / renderer->scale.y);
+        rect->w = (int)(renderer->clip_rect.w / renderer->scale.x);
+        rect->h = (int)(renderer->clip_rect.h / renderer->scale.y);
     }
 }
 
@@ -4078,10 +4078,10 @@ SDL_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
         format = SDL_GetWindowPixelFormat(renderer->window);
     }
 
-    real_rect.x = renderer->viewport.x;
-    real_rect.y = renderer->viewport.y;
-    real_rect.w = renderer->viewport.w;
-    real_rect.h = renderer->viewport.h;
+    real_rect.x = (int)renderer->viewport.x;
+    real_rect.y = (int)renderer->viewport.y;
+    real_rect.w = (int)renderer->viewport.w;
+    real_rect.h = (int)renderer->viewport.h;
     if (rect) {
         if (!SDL_IntersectRect(rect, &real_rect, &real_rect)) {
             return 0;
